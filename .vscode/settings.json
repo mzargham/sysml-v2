@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "*.sysml": "sysml",
+        "*.kerml": "kerml"
+    },
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "sensmetry.syside-editor",
+    "[sysml]": {
+        "editor.defaultFormatter": "sensmetry.syside-editor",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[kerml]": {
+        "editor.defaultFormatter": "sensmetry.syside-editor",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "jupyter.notebookFileRoot": "${workspaceFolder}"
+}

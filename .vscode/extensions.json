@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "sensmetry.syside-editor",
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-azuretools.vscode-docker"
+    ]
+}

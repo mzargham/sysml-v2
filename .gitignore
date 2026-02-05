@@ -1,0 +1,33 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# uv.lock is committed for reproducibility
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/.history/
+*.swp
+*.swo
+.idea/
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cloned repos (fetched by setup.sh, not committed)
+lib/SysML-v2-Release/
+notebooks/api-cookbook/
+docker/sysmlv2-server/

@@ -1,0 +1,46 @@
+## SysML v2 API Server — Local Development Stack
+##
+## Services:
+##   - PostgreSQL 15 (port 5432)
+##   - SysML v2 API server (port 9000) — Swagger UI at http://localhost:9000/docs/
+##
+## Usage:
+##   docker compose -f docker/docker-compose.yml up -d
+##   docker compose -f docker/docker-compose.yml down
+##
+## Note: The gorenje/sysmlv2-jupyter-docker project provides a more
+## complete stack including JupyterLab. See setup.sh for that option.
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: sysml2
+      POSTGRES_PASSWORD: sysml2
+      POSTGRES_DB: sysml2
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sysml2"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-server:
+    image: gorenje/sysmlv2-api:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "9000:9000"
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=sysml2
+      - DATABASE_USER=sysml2
+      - DATABASE_PASSWORD=sysml2
+
+volumes:
+  pgdata:
