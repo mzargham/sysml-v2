@@ -1,0 +1,31 @@
+## SysML v2 API Server — Gearshift KerML Service Backend
+##
+## Gearshift provides full KerML parsing, name resolution, semantic
+## validation, and Z3 constraint solving. It is working toward SysML v2
+## API compliance.
+##
+## Note: Gearshift does not publish Docker images yet.
+## This compose file builds from source.
+##
+## Usage:
+##   docker compose -f docker/docker-compose.gearshift.yml up -d --build
+##   docker compose -f docker/docker-compose.gearshift.yml down
+
+services:
+  gearshift:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM eclipse-temurin:21-jdk AS builder
+        RUN apt-get update && apt-get install -y git
+        WORKDIR /build
+        RUN git clone --depth 1 https://github.com/open-mbee/gearshift-kerml-service.git .
+        RUN chmod +x gradlew && ./gradlew --no-configuration-cache installDist
+
+        FROM eclipse-temurin:21-jre
+        COPY --from=builder /build/mdm-runtime/build/install/mdm-runtime /app
+        WORKDIR /app
+        EXPOSE 9000
+        CMD ["bin/mdm-runtime"]
+    ports:
+      - "9000:9000"

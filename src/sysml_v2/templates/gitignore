@@ -12,7 +12,7 @@ build/
 .ipynb_checkpoints/
 
 # IDE
-.vscode/
+.vscode/.history/
 *.swp
 *.swo
 .idea/
@@ -24,3 +24,7 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Cloned repos (fetched by sysml init, not committed)
+lib/SysML-v2-Release/
+notebooks/api-cookbook/

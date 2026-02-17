@@ -1,143 +1,140 @@
-# SysML v2 Workspace
+# sysml-v2
 
-A reproducible development environment for model-based systems engineering with [SysML v2](https://www.omg.org/spec/SysML/2.0/).
+CLI toolchain and Python library for SysML v2 model development and analysis.
 
-Provides: textual model editing in VSCode, Python interoperability, Jupyter notebooks, and a local API server.
+Install once, use across all your MBSE projects. Provides project scaffolding, model validation, API server management, and a Python client for the SysML v2 REST API.
 
 ## Prerequisites
 
-| Tool | Version | Install |
-|------|---------|---------|
-| **uv** | >= 0.9 | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| **Docker** | >= 24 | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
-| **VSCode** | latest | [code.visualstudio.com](https://code.visualstudio.com/) |
-| **git** | any | pre-installed on macOS/Linux |
+| Tool | Install |
+|------|---------|
+| **Python** >= 3.12 | [python.org](https://www.python.org/) |
+| **Docker** | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
+| **VSCode** | [code.visualstudio.com](https://code.visualstudio.com/) |
+| **git** | pre-installed on macOS/Linux |
+
+## Install
+
+```bash
+# From GitHub (recommended)
+uv tool install git+https://github.com/YOUR_USER/sysml-v2.git
+
+# From a local clone
+git clone https://github.com/YOUR_USER/sysml-v2.git
+uv tool install ./sysml-v2
+
+# Or install into an existing project's venv
+uv pip install git+https://github.com/YOUR_USER/sysml-v2.git
+```
 
 ## Quick Start
 
 ```bash
-git clone <this-repo-url> && cd sysml-v2
-make setup
-```
+# Create a new project
+mkdir my-satellite && cd my-satellite
+sysml init
 
-This runs `setup.sh`, which:
-
-1. Checks that `uv`, `docker`, and `git` are installed
-2. Installs recommended VSCode extensions (Syside Editor, Python, Jupyter, Docker)
-3. Creates a Python 3.12+ virtual environment and installs dependencies
-4. Clones the [SysML v2 standard library](https://github.com/Systems-Modeling/SysML-v2-Release) into `lib/`
-5. Clones the [API Cookbook](https://github.com/Systems-Modeling/SysML-v2-API-Cookbook) notebooks into `notebooks/api-cookbook/`
-6. Pulls Docker images for the local API server
-
-Then open the workspace in VSCode:
-
-```bash
+# Open in VS Code (installs Syside Editor extension for .sysml support)
 code .
+
+# Start the local API server
+sysml serve up
+
+# Validate your models
+sysml validate models/
+
+# Stop the server
+sysml serve down
 ```
 
-## Project Structure
+## CLI Commands
 
-```
-.
-├── models/                    SysML v2 model files (.sysml)
-│   └── examples/              Starter models (vehicle, requirements)
-├── notebooks/                 Jupyter notebooks
-│   ├── getting-started.ipynb  Intro notebook — sysml2py + API usage
-│   └── api-cookbook/           OMG API Cookbook (cloned by setup.sh)
-├── scripts/                   Python automation scripts
-├── lib/
-│   └── SysML-v2-Release/      Standard library (cloned by setup.sh)
-├── docker/
-│   └── docker-compose.yml     Local API server stack
-├── .vscode/                   Workspace settings + extension recommendations
-├── pyproject.toml             Python dependencies (managed by uv)
-├── setup.sh                   Bootstrap script
-└── Makefile                   Convenience commands
-```
+### `sysml init [PATH]`
 
-## Common Commands
-
-| Command | Description |
-|---------|-------------|
-| `make setup` | Full bootstrap (first time) |
-| `make install` | Install core Python dependencies |
-| `make install-all` | Install all dependencies including optional extras |
-| `make server-up` | Start the SysML v2 API server (port 9000) |
-| `make server-down` | Stop the API server |
-| `make server-logs` | Tail the API server logs |
-| `make lab` | Launch JupyterLab |
-| `make test` | Run Python tests |
-| `make lint` | Lint Python files with ruff |
-| `make clean` | Remove venv, caches, Docker volumes |
-| `make help` | Show all commands |
-
-## Editing SysML v2 Models
-
-The [Syside Editor](https://marketplace.visualstudio.com/items?itemName=sensmetry.syside-editor) extension provides:
-
-- Real-time validation and diagnostics
-- Semantic highlighting and auto-completion
-- Go-to-definition and find-all-references
-- Documentation on hover
-- Auto-formatting on save
-
-Open any `.sysml` file in `models/` to get started. See `models/examples/vehicle.sysml` for a part decomposition example and `models/examples/requirements.sysml` for requirements modeling.
-
-## Python Integration
-
-### Core (installed by default)
-
-- **[sysml2py](https://pypi.org/project/sysml2py/)** — Open-source library for constructing SysML v2 elements in Python
-- **[httpx](https://www.python-httpx.org/)** — HTTP client for direct API calls
-- **[JupyterLab](https://jupyter.org/)** — Notebook environment
-
-### Optional Extras
+Scaffold a new SysML v2 project with models, notebooks, VS Code config, Docker setup, and the standard library.
 
 ```bash
-# Sensmetry Syside Automator (requires license key)
-export SYSIDE_LICENSE_KEY="your-key-here"
-uv sync --extra syside
-
-# Official OMG API client (from GitHub)
-uv sync --extra api-client
-
-# Everything
-uv sync --all-extras
+sysml init                          # current directory
+sysml init my-project               # new directory
+sysml init --backend gearshift      # use Gearshift KerML backend
+sysml init -y                       # skip prompts
 ```
 
-**Syside Automator** ([docs](https://docs.sensmetry.com/automator/)) is the most capable Python library for SysML v2. It operates directly on `.sysml` files without a model server, supports model traversal, expression evaluation, and automation workflows. Requires a [Sensmetry license](https://sensmetry.com/pricing/) (30-day free trial available).
+### `sysml serve <up|down|logs|pull|status>`
 
-## Local API Server
-
-The Docker Compose stack runs PostgreSQL + the SysML v2 REST API server:
+Manage the local Docker-based API server.
 
 ```bash
-make server-up          # Start (detached)
-make server-logs        # Watch logs
-open http://localhost:9000/docs/   # Swagger UI
-make server-down        # Stop
+sysml serve up                      # start (PostgreSQL + API on port 9000)
+sysml serve status                  # check if running
+sysml serve logs                    # tail logs
+sysml serve down                    # stop
+sysml serve --backend gearshift up  # use Gearshift backend
 ```
 
-The API Cookbook notebooks in `notebooks/api-cookbook/` are designed to run against this server.
+### `sysml validate [PATH]`
 
-### Alternative: Full Stack with JupyterLab
-
-For a more complete local environment including a pre-configured JupyterLab instance:
+Validate `.sysml` files.
 
 ```bash
-git clone https://github.com/gorenje/sysmlv2-jupyter-docker.git docker/sysmlv2-server
-cd docker/sysmlv2-server && make spin-up
+sysml validate models/              # validate a directory (recursive)
+sysml validate models/vehicle.sysml # validate a single file
+sysml validate --server models/     # use Gearshift server for deeper analysis
 ```
 
-This runs PostgreSQL + API server (port 9000) + JupyterLab (port 8888).
+## Python Library
+
+```python
+from sysml_v2 import SysMLClient, load, loads, find_models
+
+# API client
+with SysMLClient() as client:       # reads server URL from sysml.toml
+    projects = client.list_projects()
+    elements = client.get_elements(project_id, commit_id)
+
+# Parse .sysml files
+model = load("models/vehicle.sysml")
+files = find_models("models/")
+```
+
+## Project Configuration
+
+`sysml init` creates a `sysml.toml` in your project root:
+
+```toml
+[server]
+backend = "gorenje"                 # or "gearshift"
+url = "http://localhost:9000"
+
+[library]
+path = "lib/SysML-v2-Release"
+
+[validate]
+mode = "local"                      # or "server"
+```
+
+## Server Backends
+
+| Backend | Description | Status |
+|---------|-------------|--------|
+| **gorenje** (default) | Ready-to-run SysML v2 API server. Docker image on DockerHub. | Stable (archived) |
+| **gearshift** | [Gearshift KerML Service](https://github.com/open-mbee/gearshift-kerml-service) — full KerML parser, name resolution, Z3 constraint solving. | Pre-release |
+
+## Optional Extras
+
+```bash
+# Jupyter notebooks
+pip install sysml-v2[jupyter]
+
+# Sensmetry Syside Automator (commercial, requires license)
+pip install sysml-v2[syside]
+```
 
 ## Resources
 
 - [SysML v2 Specification (OMG)](https://www.omg.org/spec/SysML/2.0/)
-- [SysML v2 Release Repository](https://github.com/Systems-Modeling/SysML-v2-Release) — spec docs, standard library, example models
-- [SysML v2 Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation) — Eclipse-based reference implementation
-- [Syside Editor](https://marketplace.visualstudio.com/items?itemName=sensmetry.syside-editor) — VSCode extension
-- [Syside Automator Docs](https://docs.sensmetry.com/automator/) — Python library documentation
-- [Sysand](https://github.com/sensmetry/sysand) — SysML v2 package manager
-- [sysml2py](https://pypi.org/project/sysml2py/) — Open-source Python library
-- [API Cookbook](https://github.com/Systems-Modeling/SysML-v2-API-Cookbook) — Jupyter notebook recipes
+- [SysML v2 Standard Library](https://github.com/Systems-Modeling/SysML-v2-Release)
+- [Syside Editor (VS Code)](https://marketplace.visualstudio.com/items?itemName=sensmetry.syside-editor)
+- [Gearshift KerML Service](https://github.com/open-mbee/gearshift-kerml-service)
+- [sysml2py](https://pypi.org/project/sysml2py/)
+- [SysML v2 API Cookbook](https://github.com/Systems-Modeling/SysML-v2-API-Cookbook)

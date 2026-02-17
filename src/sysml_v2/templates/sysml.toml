@@ -1,0 +1,16 @@
+# SysML v2 toolchain project configuration
+# Docs: https://github.com/???/sysml-v2
+
+[server]
+# API server backend: "gorenje" (default) or "gearshift"
+backend = "gorenje"
+# API server URL
+url = "http://localhost:9000"
+
+[library]
+# Path to the SysML v2 standard library (relative to project root)
+path = "lib/SysML-v2-Release"
+
+[validate]
+# Default validation mode: "local" or "server"
+mode = "local"

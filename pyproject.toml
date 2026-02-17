@@ -1,31 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "sysml-v2-workspace"
+name = "sysml-v2"
 version = "0.1.0"
-description = "SysML v2 model-based systems engineering workspace"
+description = "CLI toolchain and Python library for SysML v2 model development and analysis"
 requires-python = ">=3.12"
+license = "Apache-2.0"
+readme = "README.md"
+keywords = ["sysml", "mbse", "systems-engineering", "kerml", "model-based"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
-    "sysml2py>=0.5.3",
-    "jupyterlab>=4.0",
-    "requests>=2.31",
+    "click>=8.1",
     "httpx>=0.27",
-    "ipykernel>=6.29",
+    "sysml2py>=0.5.3",
+    "rich>=13.0",
 ]
 
 [project.optional-dependencies]
-# Sensmetry Syside Automator — requires a license key (SYSIDE_LICENSE_KEY env var)
+jupyter = ["jupyterlab>=4.0", "ipykernel>=6.29"]
 syside = ["syside>=0.8"]
-# Official OMG API client — installed from GitHub source
 api-client = [
     "sysml-v2-api-client @ git+https://github.com/Systems-Modeling/SysML-v2-API-Python-Client.git",
 ]
-# All optional dependencies
-all = [
-    "syside>=0.8",
-    "sysml-v2-api-client @ git+https://github.com/Systems-Modeling/SysML-v2-API-Python-Client.git",
-]
+
+[project.scripts]
+sysml = "sysml_v2.cli:main"
+
+[project.urls]
+Repository = "https://github.com/???/sysml-v2"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sysml_v2"]
 
 [dependency-groups]
 dev = [
     "pytest>=8.0",
     "ruff>=0.4",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+src = ["src"]
