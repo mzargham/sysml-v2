@@ -15,11 +15,13 @@ from sysml_v2.config import BACKENDS, load_config
 
 console = Console()
 
-# JWT token for local Flexo dev instance (expires 2029)
+# JWT token for local Flexo dev instance — "root" user with super_admins group (expires 2029)
+# Payload: {"aud":"flexo-mms-audience","iss":"http://flexo-mms-services","username":"root","groups":["super_admins"],"exp":1893456000}
+# Secret:  thisissomethingreallylong1234567801234567890
 _FLEXO_JWT = (
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
-    "eyJhdWQiOiJmbGV4by1tbXMtYXVkaWVuY2UiLCJpc3MiOiJodHRwOi8vZmxleG8tbW1zLXNlcnZpY2VzIiwidXNlcm5hbWUiOiJ1c2VyMDEiLCJncm91cHMiOlsic3VwZXJfYWRtaW5zIl0sImV4cCI6MTg2OTY3MzYwMH0."
-    "UER7sZXVa1a8i_dnk6TgIBb9SNmOfMHEUEFIQCzMgeA"
+    "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9."
+    "eyJhdWQiOiAiZmxleG8tbW1zLWF1ZGllbmNlIiwgImlzcyI6ICJodHRwOi8vZmxleG8tbW1zLXNlcnZpY2VzIiwgInVzZXJuYW1lIjogInJvb3QiLCAiZ3JvdXBzIjogWyJzdXBlcl9hZG1pbnMiXSwgImV4cCI6IDE4OTM0NTYwMDB9."
+    "40no1-AmUNJSb0XXaq8lPs-yxpTJWEH67dHJkXbLCVI"
 )
 
 

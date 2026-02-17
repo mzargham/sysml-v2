@@ -24,7 +24,7 @@ services:
     volumes:
       - ./cluster.trig:/tmp/mount/cluster.trig:ro
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:3030/$$/ping || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3030/ds || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -41,11 +41,13 @@ services:
       FLEXO_MMS_QUERY_URL: http://quad-server:3030/ds/sparql
       FLEXO_MMS_UPDATE_URL: http://quad-server:3030/ds/update
       FLEXO_MMS_GRAPH_STORE_PROTOCOL_URL: http://quad-server:3030/ds/data
+    ports:
+      - "8080:8080"
     depends_on:
       quad-store:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8080/ || exit 1"]
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8080'"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -59,7 +61,7 @@ services:
       FLEXO_PORT: 8080
       FLEXO_SYSMLV2_ORG: sysmlv2
       FLEXO_DEFAULT_TIMEOUT: 1800
-      FLEXO_AUTH: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJmbGV4by1tbXMtYXVkaWVuY2UiLCJpc3MiOiJodHRwOi8vZmxleG8tbW1zLXNlcnZpY2VzIiwidXNlcm5hbWUiOiJ1c2VyMDEiLCJncm91cHMiOlsic3VwZXJfYWRtaW5zIl0sImV4cCI6MTg2OTY3MzYwMH0.UER7sZXVa1a8i_dnk6TgIBb9SNmOfMHEUEFIQCzMgeA"
+      FLEXO_AUTH: "Bearer eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJhdWQiOiAiZmxleG8tbW1zLWF1ZGllbmNlIiwgImlzcyI6ICJodHRwOi8vZmxleG8tbW1zLXNlcnZpY2VzIiwgInVzZXJuYW1lIjogInJvb3QiLCAiZ3JvdXBzIjogWyJzdXBlcl9hZG1pbnMiXSwgImV4cCI6IDE4OTM0NTYwMDB9.40no1-AmUNJSb0XXaq8lPs-yxpTJWEH67dHJkXbLCVI"
     depends_on:
       layer1-service:
         condition: service_healthy
