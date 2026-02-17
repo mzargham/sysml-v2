@@ -71,7 +71,8 @@ def up(ctx: click.Context) -> None:
         console.print("  Run 'sysml init' first, or check you're in a SysML project.")
         sys.exit(1)
     console.print(f"Starting server using [bold]{compose_file.name}[/bold]...")
-    sys.exit(_compose(["up", "-d"], compose_file))
+    console.print("  (first run builds from source — this may take a few minutes)")
+    sys.exit(_compose(["up", "-d", "--build"], compose_file))
 
 
 @serve.command()

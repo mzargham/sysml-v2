@@ -2,14 +2,16 @@
 ##
 ## Services:
 ##   - PostgreSQL 15 (port 5432)
-##   - SysML v2 API server (port 9000) — Swagger UI at http://localhost:9000/docs/
+##   - SysML v2 API server (port 9000)
+##
+## The API server is built from the official Systems-Modeling source
+## (no pre-built Docker image exists).
+##
+## First run will take a few minutes to compile.
 ##
 ## Usage:
-##   docker compose -f docker/docker-compose.yml up -d
+##   docker compose -f docker/docker-compose.yml up -d --build
 ##   docker compose -f docker/docker-compose.yml down
-##
-## Note: The gorenje/sysmlv2-jupyter-docker project provides a more
-## complete stack including JupyterLab. See setup.sh for that option.
 
 services:
   postgres:
@@ -29,18 +31,30 @@ services:
       retries: 5
 
   api-server:
-    image: gorenje/sysmlv2-api:latest
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM eclipse-temurin:17-jdk AS builder
+        RUN apt-get update && apt-get install -y git
+        WORKDIR /build
+        RUN git clone --depth 1 https://github.com/Systems-Modeling/SysML-v2-API-Services.git .
+        RUN chmod +x gradlew && ./gradlew installDist
+
+        FROM eclipse-temurin:17-jre
+        COPY --from=builder /build/app/build/install/SysML-v2-API-Services /app
+        WORKDIR /app
+        EXPOSE 9000
+        CMD ["bin/SysML-v2-API-Services", \
+             "-Dconfig.file=conf/application.conf", \
+             "-Dplay.evolutions.db.default.autoApply=true", \
+             "-Dslick.dbs.default.db.url=jdbc:postgresql://postgres:5432/sysml2", \
+             "-Dslick.dbs.default.db.user=sysml2", \
+             "-Dslick.dbs.default.db.password=sysml2"]
     depends_on:
       postgres:
         condition: service_healthy
     ports:
       - "9000:9000"
-    environment:
-      - DATABASE_HOST=postgres
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=sysml2
-      - DATABASE_USER=sysml2
-      - DATABASE_PASSWORD=sysml2
 
 volumes:
   pgdata:

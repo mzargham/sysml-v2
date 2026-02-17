@@ -131,26 +131,9 @@ def init_cmd(path: str, backend: str, yes: bool) -> None:
                     f"SysML-v2-Release.git {lib_dest}"
                 )
 
-    # 4. Pull Docker images
-    compose_file = dest / "docker" / "docker-compose.yml"
-    if compose_file.exists() and backend == "gorenje":
-        if yes or click.confirm("Pull Docker images for the API server?", default=True):
-            console.print("  Pulling Docker images...")
-            result = subprocess.run(
-                ["docker", "compose", "-f", str(compose_file), "pull"],
-                capture_output=True,
-            )
-            if result.returncode == 0:
-                console.print("[green]\u2713[/green] Docker images pulled")
-            else:
-                console.print(
-                    "[yellow]![/yellow] Could not pull images. "
-                    "Is Docker running? Try later with: sysml serve pull"
-                )
-
     console.print()
     console.print("[bold green]Done![/bold green] Next steps:")
     console.print(f"  cd {dest.name}")
     console.print("  code .                  # open in VS Code")
-    console.print("  sysml serve up          # start the API server")
+    console.print("  sysml serve up          # start the API server (builds on first run)")
     console.print("  sysml validate models/  # validate your models")
