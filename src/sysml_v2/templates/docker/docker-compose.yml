@@ -1,60 +1,67 @@
-## SysML v2 API Server — Local Development Stack
+## SysML v2 API Server — Flexo MMS Backend
 ##
 ## Services:
-##   - PostgreSQL 15 (port 5432)
-##   - SysML v2 API server (port 9000)
+##   - Apache Fuseki quad store (SPARQL, internal)
+##   - Flexo MMS Layer 1 service (internal)
+##   - Flexo SysML v2 API (port 8083)
 ##
-## The API server is built from the official Systems-Modeling source
-## (no pre-built Docker image exists).
-##
-## First run will take a few minutes to compile.
+## Pre-built images from DockerHub — no build step required.
 ##
 ## Usage:
-##   docker compose -f docker/docker-compose.yml up -d --build
-##   docker compose -f docker/docker-compose.yml down
+##   sysml serve up
+##   sysml serve down
+##
+## After first startup, the sysmlv2 org must be initialized.
+## `sysml serve up` handles this automatically.
 
 services:
-  postgres:
-    image: postgres:15-alpine
+  quad-store:
+    image: atomgraph/fuseki:4.6
+    hostname: quad-server
     environment:
-      POSTGRES_USER: sysml2
-      POSTGRES_PASSWORD: sysml2
-      POSTGRES_DB: sysml2
-    ports:
-      - "5432:5432"
+      JAVA_OPTIONS: "-Xmx4096m -Xms4096m"
+    command: --file=/tmp/mount/cluster.trig --update /ds
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./cluster.trig:/tmp/mount/cluster.trig:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sysml2"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:3030/$$/ping || exit 1"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
-  api-server:
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM eclipse-temurin:17-jdk AS builder
-        RUN apt-get update && apt-get install -y git
-        WORKDIR /build
-        RUN git clone --depth 1 https://github.com/Systems-Modeling/SysML-v2-API-Services.git .
-        RUN chmod +x gradlew && ./gradlew installDist
-
-        FROM eclipse-temurin:17-jre
-        COPY --from=builder /build/app/build/install/SysML-v2-API-Services /app
-        WORKDIR /app
-        EXPOSE 9000
-        CMD ["bin/SysML-v2-API-Services", \
-             "-Dconfig.file=conf/application.conf", \
-             "-Dplay.evolutions.db.default.autoApply=true", \
-             "-Dslick.dbs.default.db.url=jdbc:postgresql://postgres:5432/sysml2", \
-             "-Dslick.dbs.default.db.user=sysml2", \
-             "-Dslick.dbs.default.db.password=sysml2"]
+  layer1-service:
+    image: openmbee/flexo-mms-layer1-service:v0.2.2
+    hostname: layer1-service
+    environment:
+      JWT_DOMAIN: http://flexo-mms-services
+      JWT_AUDIENCE: flexo-mms-audience
+      JWT_REALM: flexo-mms
+      JWT_SECRET: thisissomethingreallylong1234567801234567890
+      FLEXO_MMS_ROOT_CONTEXT: http://layer1-service
+      FLEXO_MMS_QUERY_URL: http://quad-server:3030/ds/sparql
+      FLEXO_MMS_UPDATE_URL: http://quad-server:3030/ds/update
+      FLEXO_MMS_GRAPH_STORE_PROTOCOL_URL: http://quad-server:3030/ds/data
     depends_on:
-      postgres:
+      quad-store:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  sysmlv2-api:
+    image: openmbee/flexo-sysmlv2:omg
+    hostname: flexo-sysmlv2
+    environment:
+      FLEXO_HOST: layer1-service
+      FLEXO_PROTOCOL: http
+      FLEXO_PORT: 8080
+      FLEXO_SYSMLV2_ORG: sysmlv2
+      FLEXO_DEFAULT_TIMEOUT: 1800
+      FLEXO_AUTH: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJmbGV4by1tbXMtYXVkaWVuY2UiLCJpc3MiOiJodHRwOi8vZmxleG8tbW1zLXNlcnZpY2VzIiwidXNlcm5hbWUiOiJ1c2VyMDEiLCJncm91cHMiOlsic3VwZXJfYWRtaW5zIl0sImV4cCI6MTg2OTY3MzYwMH0.UER7sZXVa1a8i_dnk6TgIBb9SNmOfMHEUEFIQCzMgeA"
+    depends_on:
+      layer1-service:
         condition: service_healthy
     ports:
-      - "9000:9000"
-
-volumes:
-  pgdata:
+      - "8083:8080"

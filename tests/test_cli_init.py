@@ -26,6 +26,7 @@ def test_init_creates_project_structure(tmp_path):
     assert (dest / ".gitignore").is_file()
     assert (dest / "Makefile").is_file()
     assert (dest / "docker" / "docker-compose.yml").is_file()
+    assert (dest / "docker" / "cluster.trig").is_file()
     assert (dest / ".vscode" / "settings.json").is_file()
     assert (dest / ".vscode" / "extensions.json").is_file()
     assert (dest / "models" / "package.sysml").is_file()
@@ -43,6 +44,23 @@ def test_init_substitutes_project_name(tmp_path):
 
     content = (dest / "pyproject.toml").read_text()
     assert 'name = "satellite-model"' in content
+
+
+def test_init_default_flexo_backend(tmp_path):
+    """sysml init should use the Flexo compose file by default."""
+    dest = tmp_path / "flexo-project"
+    runner = CliRunner()
+    result = runner.invoke(main, ["init", str(dest), "-y"])
+
+    assert result.exit_code == 0, result.output
+
+    compose = dest / "docker" / "docker-compose.yml"
+    assert compose.is_file()
+    content = compose.read_text()
+    assert "flexo" in content.lower()
+
+    # Flexo compose should NOT include gearshift
+    assert not (dest / "docker" / "docker-compose.gearshift.yml").exists()
 
 
 def test_init_gearshift_backend(tmp_path):

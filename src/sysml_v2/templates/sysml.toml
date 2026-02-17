@@ -2,10 +2,10 @@
 # Docs: https://github.com/???/sysml-v2
 
 [server]
-# API server backend: "gorenje" (default) or "gearshift"
-backend = "gorenje"
+# API server backend: "flexo" (default) or "gearshift"
+backend = "flexo"
 # API server URL
-url = "http://localhost:9000"
+url = "http://localhost:8083"
 
 [library]
 # Path to the SysML v2 standard library (relative to project root)

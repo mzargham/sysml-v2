@@ -8,7 +8,7 @@ def test_find_config_returns_none_when_missing(tmp_path):
 
 
 def test_find_config_finds_sysml_toml(tmp_path):
-    (tmp_path / "sysml.toml").write_text("[server]\nbackend = 'gorenje'\n")
+    (tmp_path / "sysml.toml").write_text("[server]\nbackend = 'flexo'\n")
 
     result = find_config(tmp_path)
 
@@ -17,7 +17,7 @@ def test_find_config_finds_sysml_toml(tmp_path):
 
 
 def test_find_config_walks_up(tmp_path):
-    (tmp_path / "sysml.toml").write_text("[server]\nbackend = 'gorenje'\n")
+    (tmp_path / "sysml.toml").write_text("[server]\nbackend = 'flexo'\n")
     child = tmp_path / "models" / "sub"
     child.mkdir(parents=True)
 
@@ -30,8 +30,8 @@ def test_find_config_walks_up(tmp_path):
 def test_load_config_defaults(tmp_path):
     cfg = load_config(tmp_path)
 
-    assert cfg.server.backend == "gorenje"
-    assert cfg.server.url == "http://localhost:9000"
+    assert cfg.server.backend == "flexo"
+    assert cfg.server.url == "http://localhost:8083"
     assert cfg.library.path == "lib/SysML-v2-Release"
     assert cfg.validate.mode == "local"
 

@@ -26,12 +26,14 @@ def test_serve_status_no_compose(tmp_path, monkeypatch):
     assert "No docker-compose file found" in result.output
 
 
+@patch("sysml_v2.cli.serve._init_flexo_org")
 @patch("sysml_v2.cli.serve.subprocess.run")
-def test_serve_up_calls_docker_compose(mock_run, tmp_path, monkeypatch):
+def test_serve_up_calls_docker_compose(mock_run, mock_init, tmp_path, monkeypatch):
     """sysml serve up should call docker compose up -d."""
     project = _make_project(tmp_path)
     monkeypatch.chdir(project)
     mock_run.return_value.returncode = 0
+    mock_init.return_value = True
 
     runner = CliRunner()
     runner.invoke(main, ["serve", "up"])
@@ -56,3 +58,19 @@ def test_serve_down_calls_docker_compose(mock_run, tmp_path, monkeypatch):
     mock_run.assert_called_once()
     cmd = mock_run.call_args[0][0]
     assert "down" in cmd
+
+
+@patch("sysml_v2.cli.serve._init_flexo_org")
+@patch("sysml_v2.cli.serve.subprocess.run")
+def test_serve_up_flexo_no_build_flag(mock_run, mock_init, tmp_path, monkeypatch):
+    """Flexo backend should NOT use --build (pre-built images)."""
+    project = _make_project(tmp_path)
+    monkeypatch.chdir(project)
+    mock_run.return_value.returncode = 0
+    mock_init.return_value = True
+
+    runner = CliRunner()
+    runner.invoke(main, ["serve", "up"])
+
+    cmd = mock_run.call_args[0][0]
+    assert "--build" not in cmd

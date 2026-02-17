@@ -34,7 +34,7 @@ def _copy_templates(dest: Path, project_name: str, backend: str) -> None:
         rel = item.relative_to(src)
 
         # Skip the alternative docker-compose based on chosen backend
-        if backend == "gorenje" and rel.name == "docker-compose.gearshift.yml":
+        if backend == "flexo" and rel.name == "docker-compose.gearshift.yml":
             continue
         if backend == "gearshift" and rel.name == "docker-compose.yml":
             continue
@@ -71,9 +71,9 @@ def _copy_templates(dest: Path, project_name: str, backend: str) -> None:
 @click.argument("path", default=".", type=click.Path())
 @click.option(
     "--backend",
-    type=click.Choice(["gorenje", "gearshift"]),
-    default="gorenje",
-    help="API server backend (default: gorenje).",
+    type=click.Choice(["flexo", "gearshift"]),
+    default="flexo",
+    help="API server backend (default: flexo).",
 )
 @click.option("--yes", "-y", is_flag=True, help="Skip interactive prompts.")
 def init_cmd(path: str, backend: str, yes: bool) -> None:

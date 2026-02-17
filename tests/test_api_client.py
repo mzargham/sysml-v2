@@ -50,14 +50,14 @@ def test_get_project():
 
 
 def test_healthy_returns_true():
-    client = _make_client({"/": {"status": "ok"}})
+    client = _make_client({"/projects": []})
 
     assert client.healthy() is True
     client.close()
 
 
 def test_context_manager():
-    client = _make_client({"/": {}})
+    client = _make_client({"/projects": []})
     with client as c:
         assert c.healthy()
 

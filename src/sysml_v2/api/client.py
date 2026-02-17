@@ -15,12 +15,12 @@ class SysMLClient:
     """Lightweight client for the SysML v2 Systems Modeling API.
 
     Works with any server that implements the SysML v2 REST API
-    (gorenje/sysmlv2-api, Gearshift, or the reference implementation).
+    (Flexo MMS, Gearshift, or the reference implementation).
 
     Usage::
 
         client = SysMLClient()              # reads url from sysml.toml or default
-        client = SysMLClient("http://localhost:9000")
+        client = SysMLClient("http://localhost:8083")
         projects = client.list_projects()
     """
 
@@ -45,7 +45,7 @@ class SysMLClient:
     def healthy(self) -> bool:
         """Return True if the API server is reachable."""
         try:
-            resp = self._client.get("/")
+            resp = self._client.get("/projects")
             return resp.status_code < 500
         except httpx.HTTPError:
             return False

@@ -9,13 +9,13 @@ from pathlib import Path
 CONFIG_FILENAME = "sysml.toml"
 
 # Backends supported by ``sysml serve``
-BACKENDS = ("gorenje", "gearshift")
+BACKENDS = ("flexo", "gearshift")
 
 
 @dataclass(frozen=True)
 class ServerConfig:
-    backend: str = "gorenje"
-    url: str = "http://localhost:9000"
+    backend: str = "flexo"
+    url: str = "http://localhost:8083"
 
 
 @dataclass(frozen=True)
@@ -60,8 +60,8 @@ def load_config(start: Path | None = None) -> ProjectConfig:
 
     return ProjectConfig(
         server=ServerConfig(
-            backend=server_raw.get("backend", "gorenje"),
-            url=server_raw.get("url", "http://localhost:9000"),
+            backend=server_raw.get("backend", "flexo"),
+            url=server_raw.get("url", "http://localhost:8083"),
         ),
         library=LibraryConfig(
             path=library_raw.get("path", "lib/SysML-v2-Release"),

@@ -1,0 +1,69 @@
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix mms: <https://mms.openmbee.org/rdf/ontology/>
+prefix mms-object: <https://mms.openmbee.org/rdf/objects/>
+prefix m: <http://layer1-service/>
+prefix m-graph: <http://layer1-service/graphs/>
+prefix m-user: <http://layer1-service/users/>
+prefix m-group: <http://layer1-service/groups/>
+prefix m-policy: <http://layer1-service/policies/>
+
+graph m-graph:AccessControl.Agents {
+	m-user:root a mms:User ;
+		mms:id "root" .
+
+	m-user:admin a mms:User ;
+		mms:group m-group:SuperAdmins ;
+		mms:id "admin" .
+
+	m-user:anon a mms:User ;
+		mms:id "anon" .
+
+	<http://layer1-service/users/ldap/user/user01> a mms:User ;
+		mms:id "ldap/user/user01" .
+
+	<http://layer1-service/users/ldap/user/user02> a mms:User ;
+		mms:id "ldap/user/user02" .
+
+	<http://layer1-service/groups/ldap/group/group01> a mms:Group ;
+		mms:id "ldap/group/group01" .
+
+	m-group:SuperAdmins a mms:Group ;
+		mms:id "super_admins" ;
+		mms:etag "mms-init-etag-value-group-SuperAdmins" .
+}
+
+graph m-graph:AccessControl.Policies {
+	m-policy:DefaultSuperAdmins a mms:Policy ;
+		mms:subject m-user:root, m-group:SuperAdmins, <http://layer1-service/users/ldap/user/user01>, <http://layer1-service/groups/ldap/group/group01> ;
+		mms:scope <http://layer1-service/> ;
+		mms:role mms-object:Role.AdminCluster, mms-object:Role.AdminOrg, mms-object:Role.AdminRepo, mms-object:Role.AdminMetadata, mms-object:Role.AdminModel, mms-object:Role.AdminAccessControlAny .
+}
+
+graph m-graph:Cluster {
+	<http://layer1-service/> a mms:Cluster .
+	<http://layer1-service/access-control-scope/> a mms:AccessControlAny .
+}
+
+graph m-graph:Schema {
+	mms:Project a rdfs:Class ; rdfs:label "Project" .
+	mms:Collection a rdfs:Class ; rdfs:label "Collection" ; rdfs:subClassOf mms:Project .
+	mms:Repo a rdfs:Class ; rdfs:label "Repo" ; rdfs:subClassOf mms:Project .
+	mms:Ref a rdfs:Class ; rdfs:label "Ref" .
+	mms:Branch a rdfs:Class ; rdfs:label "Branch" ; rdfs:subClassOf mms:Ref .
+	mms:Lock a rdfs:Class ; rdfs:label "Lock" ; rdfs:subClassOf mms:Ref .
+	mms:InterimLock a rdfs:Class ; rdfs:label "InterimLock" ; rdfs:subClassOf mms:Lock .
+	mms:Artifact a rdfs:Class ; rdfs:label "Artifact" .
+	mms:Scratch a rdfs:Class ; rdfs:label "Scratch" .
+	mms:Snapshot a rdfs:Class ; rdfs:label "Snapshot" .
+	mms:Model a rdfs:Class ; rdfs:label "Model" ; rdfs:subClassOf mms:Snapshot .
+	mms:Staging a rdfs:Class ; rdfs:label "Staging" ; rdfs:subClassOf mms:Snapshot .
+	mms:Commit a rdfs:Class ; rdfs:label "Commit" .
+	mms:Agent a rdfs:Class ; rdfs:label "Agent" .
+	mms:User a rdfs:Class ; rdfs:label "User" ; rdfs:subClassOf mms:Agent .
+	mms:Group a rdfs:Class ; rdfs:label "Group" ; rdfs:subClassOf mms:Agent .
+	mms:Policy a rdfs:Class ; rdfs:label "Policy" .
+	mms:ref a rdf:Property ; rdfs:label "ref" ; rdfs:range mms:Ref .
+	mms:commit a rdf:Property ; rdfs:label "commit" ; rdfs:range mms:Commit .
+	mms:snapshot a rdf:Property ; rdfs:label "snapshot" ; rdfs:range mms:Snapshot .
+}

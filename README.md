@@ -56,7 +56,7 @@ Scaffold a new SysML v2 project with models, notebooks, VS Code config, Docker s
 ```bash
 sysml init                          # current directory
 sysml init my-project               # new directory
-sysml init --backend gearshift      # use Gearshift KerML backend
+sysml init --backend gearshift      # use Gearshift backend instead of Flexo
 sysml init -y                       # skip prompts
 ```
 
@@ -65,7 +65,7 @@ sysml init -y                       # skip prompts
 Manage the local Docker-based API server.
 
 ```bash
-sysml serve up                      # start (PostgreSQL + API on port 9000)
+sysml serve up                      # start (Flexo MMS on port 8083)
 sysml serve status                  # check if running
 sysml serve logs                    # tail logs
 sysml serve down                    # stop
@@ -103,8 +103,8 @@ files = find_models("models/")
 
 ```toml
 [server]
-backend = "gorenje"                 # or "gearshift"
-url = "http://localhost:9000"
+backend = "flexo"                   # or "gearshift"
+url = "http://localhost:8083"
 
 [library]
 path = "lib/SysML-v2-Release"
@@ -117,8 +117,8 @@ mode = "local"                      # or "server"
 
 | Backend | Description | Status |
 |---------|-------------|--------|
-| **gorenje** (default) | Ready-to-run SysML v2 API server. Docker image on DockerHub. | Stable (archived) |
-| **gearshift** | [Gearshift KerML Service](https://github.com/open-mbee/gearshift-kerml-service) — full KerML parser, name resolution, Z3 constraint solving. | Pre-release |
+| **flexo** (default) | [Flexo MMS](https://github.com/Open-MBEE/flexo-mms-deployment) — OpenMBEE SysML v2 API, port 8083 | Stable |
+| **gearshift** | [Gearshift KerML Service](https://github.com/open-mbee/gearshift-kerml-service) — KerML parser, Z3 solver, port 9000 | Pre-release |
 
 ## Optional Extras
 
